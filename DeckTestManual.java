@@ -17,12 +17,12 @@ public class DeckTestManual {
         Card testCard = new Card(Card.Suit.HEARTS, Card.Rank.ACE);
         System.out.println("Test Card: " + testCard); // Expected output should be : "ACE of HEARTS (11)"
 
-        // Creating a new deck and shuffling it
+        /** Creating a new deck and shuffling it */
         Deck deck = new Deck();
         System.out.println("Number of cards before shuffling: " + deck.cardsRemaining()); // Expected: 52
         deck.shuffle();
 
-        // Deal out some cards
+        /** Deal out some cards */
         System.out.println("Dealing cards:");
         for (int i = 0; i < 5; i++) {
             System.out.println(deck.dealCard()); // Print the details of each dealt card
@@ -31,7 +31,7 @@ public class DeckTestManual {
         /** Show the number of remaining cards */
         System.out.println("Number of cards remaining: " + deck.cardsRemaining()); // Expected: 47
 
-        // Test dealing until the deck is empty
+        /** Test dealing until the deck is empty */
         while (deck.cardsRemaining() > 0) {
             deck.dealCard();
         }
