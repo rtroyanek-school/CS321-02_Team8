@@ -7,21 +7,21 @@ package com.mycompany.blackjackgame;
 /**
  *
  * @author rkigwana
+ * Represents a deck of 52 playing cards. Responsible for initializing,
+ * shuffling, and dealing cards.
  */
- 
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * Represents a deck of 52 playing cards. Responsible for initializing,
- * shuffling, and dealing cards.
+ * shuffling, and dealing cards. Automatically reinitializes if the deck runs out.
  */
 public class Deck {
 
-    /**A list to hold all 52 cards
-     *
-     */
+    // List to hold all 52 cards
     private List<Card> deck;
 
     /**
@@ -33,10 +33,10 @@ public class Deck {
     }
 
     /**
-     * Initializes the deck with all 52 cards, one for each combination
-     * of Suit and Rank.
+     * Initializes the deck with all 52 cards, one for each combination of Suit and Rank.
      */
     private void initializeDeck() {
+        deck.clear(); /** Clears any existing cards to avoid having duplicates */
         for (Card.Suit suit : Card.Suit.values()) {
             for (Card.Rank rank : Card.Rank.values()) {
                 deck.add(new Card(suit, rank));
@@ -45,21 +45,23 @@ public class Deck {
     }
 
     /**
-     * Shuffles the deck, randomizing the order of cards.
+     * Shuffles the deck, and randomizes the order of cards.
      */
     public void shuffle() {
         Collections.shuffle(deck);
     }
 
     /**
-     * Deals the top card from the deck. Removes and returns the card.
+     * Deals the top card from the deck. If the deck is empty, it reinitializes
+     * and shuffles the new deck before it deals the card.
      *
      * @return the top card from the deck
-     * @throws IllegalStateException if the deck is empty
      */
     public Card dealCard() {
         if (deck.isEmpty()) {
-            throw new IllegalStateException("Cannot deal from an empty deck.");
+            System.out.println("Deck is empty. Creating and shuffling a new deck...");
+            initializeDeck();
+            shuffle();
         }
         return deck.remove(0);
     }
