@@ -18,7 +18,6 @@ public class Dealer {
             hand.addCard(newCard);
             System.out.println("Dealer draws: " + newCard);
         }
-        System.out.println("Dealer's final hand: " + hand + " (Total: " + hand.getHandValue() + ")");
     }
 
     // Shows the dealer's first card (for players to see)
