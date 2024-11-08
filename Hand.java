@@ -58,6 +58,6 @@ public class Hand {
         if (handString.length() > 0) {
             handString.setLength(handString.length() - 2);
         }
-        return handString + " (Total: " + getHandValue() + ")";
+        return handString.toString();
     }
 }
