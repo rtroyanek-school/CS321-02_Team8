@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.blackjackgame;
 
 import java.util.Scanner;
@@ -11,15 +7,17 @@ public class Game {
     private User user;
     private Dealer dealer;
     private Scanner scanner;
+    private Statistics stats; // Statistics tracking
 
     /**
-     * Initializes the game with a new deck, user, and dealer.
+     * Initializes the game with a new deck, user, dealer, and statistics.
      */
     public Game() {
         deck = new Deck();
         user = new User(deck);
         dealer = new Dealer(deck);
         scanner = new Scanner(System.in);
+        stats = new Statistics(); // Initialize stats
     }
 
     /**
@@ -38,7 +36,8 @@ public class Game {
             resetHands();
         }
 
-        System.out.println("Thanks for playing!");
+        System.out.println("Thanks for playing! Here are your final statistics:");
+        stats.printStatistics(); // Display final statistics
     }
 
     /**
@@ -53,12 +52,19 @@ public class Game {
             System.out.println("You have Blackjack!");
             if (dealer.hasBlackjack()) {
                 System.out.println("Dealer also has Blackjack. It's a tie!");
+                updateStatistics(false, false, true);
             } else {
                 System.out.println("You win!");
+                dealer.reactToLoss();
+                updateStatistics(true, false, false);
             }
+            displayRoundStatistics();
             return;
         } else if (dealer.hasBlackjack()) {
             System.out.println("Dealer has Blackjack! You lose.");
+            dealer.reactToWin();
+            updateStatistics(false, true, false);
+            displayRoundStatistics();
             return;
         }
 
@@ -72,6 +78,17 @@ public class Game {
 
         // Determine the outcome
         determineWinner();
+        displayRoundStatistics(); // Display wins after the round ends
+    }
+
+    /**
+     * Displays the current statistics after each round.
+     */
+    private void displayRoundStatistics() {
+        System.out.println("\nCurrent Statistics:");
+        System.out.println("Total Player Wins: " + stats.getPlayerWins());
+        System.out.println("Total Dealer Wins: " + stats.getDealerWins());
+        System.out.println("Total Ties: " + stats.getTies());
     }
 
     /**
@@ -125,12 +142,13 @@ public class Game {
      * Manages the dealer's turn according to the dealer's rules.
      */
     private void dealerTurn() {
-    dealer.playTurn(); /** Only the dealer's drawing and turn logic */
-    dealer.revealHand(); /** Display the final hand once after the turn */
-}
+        dealer.playTurn(); // Dealer plays according to house rules
+        dealer.revealHand(); // Reveal all cards after dealer finishes
+        System.out.println();
+    }
 
     /**
-     * Compares the player's and dealer's hands to determine the winner.
+     * Compares the player's and dealer's hands to determine the winner and updates statistics.
      */
     private void determineWinner() {
         int playerTotal = user.getHandValue();
@@ -142,14 +160,34 @@ public class Game {
 
         if (playerTotal > 21) {
             System.out.println("You busted! Dealer wins.");
+            dealer.reactToPlayerBust();
+            updateStatistics(false, true, false);
         } else if (dealerTotal > 21 || playerTotal > dealerTotal) {
             System.out.println("You win!");
+            dealer.reactToLoss();
+            updateStatistics(true, false, false);
         } else if (playerTotal < dealerTotal) {
             System.out.println("Dealer wins.");
+            dealer.reactToWin();
+            updateStatistics(false, true, false);
         } else {
             System.out.println("It's a tie!");
+            updateStatistics(false, false, true);
         }
         System.out.println();
+    }
+
+    /**
+     * Updates the statistics for the current round.
+     */
+    private void updateStatistics(boolean playerWon, boolean dealerWon, boolean isTie) {
+        stats.recordGame(
+            playerWon,
+            dealerWon,
+            isTie,
+            user.getHand().isBlackjack(),
+            dealer.hasBlackjack()
+        );
     }
 
     /**
