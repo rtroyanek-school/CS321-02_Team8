@@ -1,54 +1,64 @@
 package com.mycompany.blackjackgame;
 
+package com.mycompany.blackjackgame;
+
+/**
+ * Represents the dealer in a Blackjack game.
+ * The dealer has a hand of cards and follows specific rules for drawing cards.
+ */
 public class Dealer {
-    private Hand hand;  // The dealer's hand of cards
-    private Deck deck;  // The deck used in the game
+    private Hand hand; // The dealer's hand of cards
 
-    // Constructor to initialize the dealer's hand and the deck
-    public Dealer(Deck deck) {
+    /**
+     * Constructs a Dealer with an empty hand.
+     */
+    public Dealer() {
         this.hand = new Hand();
-        this.deck = deck;
     }
 
-    // Dealer's turn: hits until hand value reaches 17 or higher
-    public void playTurn() {
-        System.out.println("Dealer's turn:");
-        while (hand.getHandValue() < 17) {
-            Card newCard = deck.dealCard();
-            hand.addCard(newCard);
-            System.out.println("Dealer draws: " + newCard);
-        }
+    /**
+     * Draws a card from the deck and adds it to the dealer's hand.
+     *
+     * @param deck the deck from which to draw the card
+     */
+    public void drawCard(Deck deck) {
+        Card card = deck.dealCard();
+        hand.addCard(card);
     }
 
-    // Shows the dealer's first card (for players to see)
-    public void showInitialCard() {
-        if (!hand.getCards().isEmpty()) {
-            System.out.println("Dealer shows: " + hand.getCards().get(0));
-        }
-    }
-
-    // Reveal the dealer's full hand at the end of the round
-    public void revealHand() {
-        System.out.println("Dealer's full hand: " + hand + " (Total: " + hand.getHandValue() + ")");
-    }
-
-    // Get the dealer's hand value for comparisons
+    /**
+     * Returns the total value of the dealer's hand.
+     *
+     * @return the value of the dealer's hand
+     */
     public int getHandValue() {
-        return hand.getHandValue();
+        return hand.getValue();
     }
 
-    // Accessor to get the dealer's hand
+    /**
+     * Returns the dealer's hand.
+     *
+     * @return the dealer's hand
+     */
     public Hand getHand() {
         return hand;
     }
 
-    // Resets the dealer's hand for a new round
+    /**
+     * Resets the dealer's hand to an empty hand for a new round.
+     */
     public void resetHand() {
-        hand.clear();
+        hand = new Hand();
     }
 
-    // Checks if the dealer has a blackjack (initial Ace and 10-value card)
-    public boolean hasBlackjack() {
-        return hand.getHandValue() == 21 && hand.getCards().size() == 2;
+    /**
+     * Plays the dealer's turn by drawing cards until the hand value is at least 17.
+     *
+     * @param deck the deck from which to draw cards
+     */
+    public void playTurn(Deck deck) {
+        while (getHandValue() < 17) {
+            drawCard(deck);
+        }
     }
 }
