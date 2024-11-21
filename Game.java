@@ -4,161 +4,183 @@
  */
 package com.mycompany.blackjackgame;
 
-import java.util.Scanner;
-
+/**
+ * Represents the main logic of the Blackjack game.
+ * Manages the deck, user, dealer, and game flow.
+ */
 public class Game {
-    private Deck deck;
-    private User user;
-    private Dealer dealer;
-    private Scanner scanner;
+    private Deck deck; // The deck used in the game
+    private User user; // The player in the game
+    private Dealer dealer; // The dealer in the game
+    private int playerWins = 0; // Count of player wins
+    private int dealerWins = 0; // Count of dealer wins
+    private int ties = 0; // Count of ties
+    private boolean gameEnded; // Flag to indicate if the game has ended
 
     /**
-     * Initializes the game with a new deck, user, and dealer.
+     * Constructs a new Game instance with a deck, user, and dealer.
      */
     public Game() {
         deck = new Deck();
-        user = new User(deck);
-        dealer = new Dealer(deck);
-        scanner = new Scanner(System.in);
+        user = new User();
+        dealer = new Dealer();
+        gameEnded = false;
     }
 
     /**
-     * Starts a new game, handles the initial deal, and manages the game flow.
+     * Starts a new game, resets the previous state, and deals initial cards to the user and dealer.
      */
     public void startGame() {
-        System.out.println("Welcome to Blackjack!");
-
-        while (true) {
-            playRound();
-            System.out.print("Play another round? (y/n): ");
-            String input = scanner.nextLine();
-            if (!input.equalsIgnoreCase("y")) {
-                break;
-            }
-            resetHands();
-        }
-
-        System.out.println("Thanks for playing!");
-    }
-
-    /**
-     * Plays one round of Blackjack.
-     */
-    private void playRound() {
+        resetGame(); // Properly reset the game before starting
         deck.shuffle();
-        dealInitialCards();
-
-        // Check for initial Blackjacks
-        if (user.getHand().isBlackjack()) {
-            System.out.println("You have Blackjack!");
-            if (dealer.hasBlackjack()) {
-                System.out.println("Dealer also has Blackjack. It's a tie!");
-            } else {
-                System.out.println("You win!");
-            }
-            return;
-        } else if (dealer.hasBlackjack()) {
-            System.out.println("Dealer has Blackjack! You lose.");
-            return;
-        }
-
-        // Player's turn
-        playerTurn();
-
-        // Dealer's turn if player didn't bust
-        if (user.getHandValue() <= 21) {
-            dealerTurn();
-        }
-
-        // Determine the outcome
-        determineWinner();
+        user.drawCard(deck);
+        user.drawCard(deck);
+        dealer.drawCard(deck);
+        dealer.drawCard(deck);
+        gameEnded = false;
     }
 
     /**
-     * Deals two initial cards to both the player and the dealer.
+     * Handles the player's "hit" action, drawing a card from the deck.
+     * Ends the game if the player busts (hand value exceeds 21).
      */
-    private void dealInitialCards() {
-        System.out.println("\nDealing initial cards...");
-        
-        // Draw first card for the player and display once
-        user.drawCard(deck);
-        System.out.println("Your hand: " + user.getHand() + " (Total: " + user.getHandValue() + ")");
-        
-        // Draw second card for the player and display once
-        user.drawCard(deck);
-        System.out.println("Your hand: " + user.getHand() + " (Total: " + user.getHandValue() + ")\n");
-
-        // Dealer draws two cards but only shows the first card
-        dealer.getHand().addCard(deck.dealCard());
-        dealer.getHand().addCard(deck.dealCard());
-        
-        dealer.showInitialCard();
-        System.out.println();
-    }
-
-    /**
-     * Manages the player's turn, allowing them the choice to hit or stand.
-     */
-    private void playerTurn() {
-        System.out.println("\nPlayer's turn:");
-        while (true) {
-            System.out.print("Would you like to 'hit' or 'stand'? ");
-            String choice = scanner.nextLine();
-            
-            if (choice.equalsIgnoreCase("hit")) {
-                user.drawCard(deck);
-                System.out.println("Your hand: " + user.getHand() + " (Total: " + user.getHandValue() + ")\n");
-                if (user.getHandValue() > 21) {
-                    System.out.println("Bust! You went over 21.\n");
-                    return;
-                }
-            } else if (choice.equalsIgnoreCase("stand")) {
-                break;
-            } else {
-                System.out.println("Invalid choice. Please type 'hit' or 'stand'.");
+    public void playerHit() {
+        if (!gameEnded) {
+            user.drawCard(deck);
+            if (user.getHandValue() > 21) {
+                gameEnded = true;
+                calculateOutcome(); // Only update stats once
             }
         }
-        System.out.println();
     }
 
     /**
-     * Manages the dealer's turn according to the dealer's rules.
+     * Handles the player's "stand" action, allowing the dealer to take their turn.
+     * Ends the game after the dealer's turn.
      */
-    private void dealerTurn() {
-    dealer.playTurn(); /** Only the dealer's drawing and turn logic */
-    dealer.revealHand(); /** Display the final hand once after the turn */
-}
+    public void playerStand() {
+        if (!gameEnded) {
+            dealer.playTurn(deck);
+            gameEnded = true;
+            calculateOutcome(); // Only update stats once
+        }
+    }
 
     /**
-     * Compares the player's and dealer's hands to determine the winner.
+     * Checks if the game is over.
+     *
+     * @return true if the game has ended, false otherwise
      */
-    private void determineWinner() {
+    public boolean isGameOver() {
+        return gameEnded;
+    }
+
+    /**
+     * Determines the outcome of the game and returns it as a string.
+     *
+     * @return a string describing the outcome of the game
+     */
+    public String getOutcome() {
         int playerTotal = user.getHandValue();
         int dealerTotal = dealer.getHandValue();
 
-        System.out.println("Final Results:");
-        System.out.println("Player's total: " + playerTotal);
-        System.out.println("Dealer's total: " + dealerTotal);
-
         if (playerTotal > 21) {
-            System.out.println("You busted! Dealer wins.");
+            return "You busted! Dealer wins.";
         } else if (dealerTotal > 21 || playerTotal > dealerTotal) {
-            System.out.println("You win!");
+            return "You win!";
         } else if (playerTotal < dealerTotal) {
-            System.out.println("Dealer wins.");
+            return "Dealer wins.";
         } else {
-            System.out.println("It's a tie!");
+            return "It's a tie!";
         }
-        System.out.println();
     }
 
     /**
-     * Resets both the player's and dealer's hands for the next round.
+     * Returns the dealer's initial card for display purposes.
+     *
+     * @return a string representing the dealer's first card
      */
-    private void resetHands() {
+    public String getDealerInitialCard() {
+        if (!dealer.getHand().getCards().isEmpty()) {
+            return dealer.getHand().getCards().get(0).toString(); // Return only the first card of the dealer's hand.
+        } else {
+            return "No cards available"; // Fallback if dealer's hand is empty.
+        }
+    }
+
+    /**
+     * Calculates the outcome of the game and updates the statistics for player wins, dealer wins, or ties.
+     */
+    private void calculateOutcome() {
+        int playerTotal = user.getHandValue();
+        int dealerTotal = dealer.getHandValue();
+
+        if (playerTotal > 21) {
+            dealerWins++;
+        } else if (dealerTotal > 21 || playerTotal > dealerTotal) {
+            playerWins++;
+        } else if (playerTotal < dealerTotal) {
+            dealerWins++;
+        } else {
+            ties++;
+        }
+    }
+
+    /**
+     * Returns the player's hand.
+     *
+     * @return the player's hand
+     */
+    public Hand getPlayerHand() {
+        return user.getHand();
+    }
+
+    /**
+     * Returns the dealer's hand.
+     *
+     * @return the dealer's hand
+     */
+    public Hand getDealerHand() {
+        return dealer.getHand();
+    }
+
+    /**
+     * Returns the number of times the player has won.
+     *
+     * @return the number of player wins
+     */
+    public int getPlayerWins() {
+        return playerWins;
+    }
+
+    /**
+     * Returns the number of times the dealer has won.
+     *
+     * @return the number of dealer wins
+     */
+    public int getDealerWins() {
+        return dealerWins;
+    }
+
+    /**
+     * Returns the number of ties that have occurred.
+     *
+     * @return the number of ties
+     */
+    public int getTies() {
+        return ties;
+    }
+
+    /**
+     * Resets the game state, including the user's and dealer's hands, and sets gameEnded to false.
+     */
+    private void resetGame() {
         user.resetHand();
         dealer.resetHand();
+        gameEnded = false;
     }
+}
+
 
     public static void main(String[] args) {
         Game game = new Game();
