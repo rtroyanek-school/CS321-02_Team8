@@ -5,41 +5,28 @@
 package com.mycompany.blackjackgame;
 
 /**
- *
- * @author rkigwana
- * Represents a single playing card with a suit and rank.
+ * Represents a playing card with a suit and rank.
  */
 public class Card {
+    
+    /**
+     * Enum for the four suits of a card: CLUBS, DIAMONDS, HEARTS, SPADES.
+     */
+    public enum Suit { CLUBS, DIAMONDS, HEARTS, SPADES }
+    
+    /**
+     * Enum for the thirteen ranks of a card: TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE.
+     */
+    public enum Rank { TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE }
 
-    /** Nested enums for Suit and Rank */
-    public enum Suit {
-        HEARTS, DIAMONDS, CLUBS, SPADES
-    }
-
-    public enum Rank {
-        TWO(2), THREE(3), FOUR(4), FIVE(5), SIX(6), SEVEN(7), EIGHT(8), NINE(9), TEN(10),
-        JACK(10), QUEEN(10), KING(10), ACE(11);
-
-        private final int rankValue;
-
-        Rank(int value) {
-            this.rankValue = value;
-        }
-
-        public int getRankValue() {
-            return rankValue;
-        }
-    }
-
-    /** Variables for suit and rank */
-    private final Suit suit;
-    private final Rank rank;
+    private final Suit suit;  // The suit of the card
+    private final Rank rank;  // The rank of the card
 
     /**
-     * Creates a card given a suit and rank.
+     * Constructs a card given a suit and rank.
      *
-     * @param suit the suit of the card (e.g., HEARTS, DIAMONDS)
-     * @param rank the rank of the card (e.g., TWO, KING, ACE)
+     * @param suit the suit of the card (e.g., CLUBS, DIAMONDS, HEARTS, SPADES)
+     * @param rank the rank of the card (e.g., TWO, THREE, KING, ACE)
      */
     public Card(Suit suit, Rank rank) {
         this.suit = suit;
@@ -47,19 +34,9 @@ public class Card {
     }
 
     /**
-     * Gets the Blackjack value of the card.
-     * Face cards are worth 10, Aces are 11, and other cards have their rank value.
-     *
-     * @return the value of the card
-     */
-    public int getValue() {
-        return rank.getRankValue();
-    }
-
-    /**
      * Returns the suit of the card.
      *
-     * @return the suit
+     * @return the suit of the card
      */
     public Suit getSuit() {
         return suit;
@@ -68,20 +45,45 @@ public class Card {
     /**
      * Returns the rank of the card.
      *
-     * @return the rank
+     * @return the rank of the card
      */
     public Rank getRank() {
         return rank;
     }
 
     /**
-     * Returns a string representation of the card.
-     * Example: "KING of SPADES (10)"
+     * Returns the Blackjack value of the card.
+     * Face cards (JACK, QUEEN, KING) are worth 10, Aces are worth 11, and other cards have their rank value.
+     *
+     * @return the value of the card
+     */
+    public int getValue() {
+        switch (rank) {
+            case TWO: return 2;
+            case THREE: return 3;
+            case FOUR: return 4;
+            case FIVE: return 5;
+            case SIX: return 6;
+            case SEVEN: return 7;
+            case EIGHT: return 8;
+            case NINE: return 9;
+            case TEN:
+            case JACK:
+            case QUEEN:
+            case KING: return 10;
+            case ACE: return 11;
+        }
+        return 0; // Should never reach here
+    }
+
+    /**
+     * Returns a string representation of the card, including its rank and suit.
+     * Example: "KING of SPADES"
      *
      * @return a string describing the card
      */
     @Override
     public String toString() {
-        return rank + " of " + suit + " (" + getValue() + ")";
+        return rank + " of " + suit;
     }
-}
+} 
