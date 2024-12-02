@@ -76,6 +76,19 @@ public class Card {
         return 0; // Should never reach here
     }
 
+     /**
+     * Returns the path of the card in the format "resizedCards/value_of_suit.png".
+     *
+     * @return the path of the card
+     */
+    public String getImagePath() {
+        // Convert rank and suit to lowercase and replace underscores with spaces for ranks
+        String rankName = rank.name().toLowerCase();
+        String suitName = suit.name().toLowerCase();
+        return "resizedCards/" + rankName + "_of_" + suitName + ".png";
+    }
+
+
     /**
      * Returns a string representation of the card, including its rank and suit.
      * Example: "KING of SPADES"
