@@ -1,67 +1,47 @@
 package com.mycompany.blackjackgame;
 
-import java.awt.*;
 import javax.swing.*;
+import java.awt.*;
 import java.net.URL;
 
 public class GraphicalCard {
 
-    public static final int SPADES = 0;
-    public static final int HEARTS = 1;
-    public static final int DIAMONDS = 2;
-    public static final int CLUBS = 3;
-    public static final int JOKER = 4;
+    private final Card card;  // Reference to the associated Card object
+    private Image cardImage;
 
-    private final int suit;
-    private final int value;
-
-    private static Image cardImage;
-    private static boolean imageLoaded;
-
-    public GraphicalCard(int value, int suit) {
-        this.value = value;
-        this.suit = suit;
+    // Constructor that takes a Card object
+    public GraphicalCard(Card card) {
+        this.card = card;
+        loadCardImage();
     }
 
-    public void draw(Graphics g, JPanel panel, int x, int y) {
-        String cardPath = card.getImagePath();
-        Image cardImage = new ImageIcon().getImage();
-        g.drawImage(cardImage, x, y, 80, 120, panel); 
-    }
+    // Load the card image using the path from the card object
+    private void loadCardImage() {
+        try {
+            String cardPath = card.getImagePath(); // Example: "resizedCards/two_of_clubs.png"
+            URL imageUrl = getClass().getClassLoader().getResource(cardPath);
 
-    private boolean findImage() {
-        if (imageLoaded)
-            return (cardImage != null);
-        imageLoaded = true;
-        ClassLoader cl = GraphicalCard.class.getClassLoader();
-        URL imageURL = cl.getResource("cards.png");
-        if (imageURL == null)
-            return false;
-        cardImage = Toolkit.getDefaultToolkit().createImage(imageURL);
-        return (cardImage != null);
-    }
-
-    private String getSuitAsString() {
-        switch (suit) {
-            case SPADES: return "Spades";
-            case HEARTS: return "Hearts";
-            case DIAMONDS: return "Diamonds";
-            case CLUBS: return "Clubs";
-            default: return "Joker";
+            if (imageUrl != null) {
+                cardImage = new ImageIcon(imageUrl).getImage();
+                System.out.println("Successfully loaded image for: " + cardPath);
+            } else {
+                System.err.println("Error: Could not load image from path: " + cardPath);
+            }
+        } catch (Exception e) {
+            System.err.println("Exception while loading card image: " + e.getMessage());
         }
     }
 
-    private String getValueAsString() {
-        if (suit == JOKER)
-            return "Joker";
-        else {
-            switch (value) {
-                case 1: return "Ace";
-                case 11: return "Jack";
-                case 12: return "Queen";
-                case 13: return "King";
-                default: return String.valueOf(value);
-            }
+    // Draw the card in the given Graphics context
+    public void draw(Graphics g, JPanel panel, int x, int y) {
+        if (cardImage != null) {
+            g.drawImage(cardImage, x, y, 80, 120, panel);
+        } else {
+            // Fallback: Draw a placeholder rectangle or error indicator
+            g.setColor(Color.RED);
+            g.fillRect(x, y, 80, 120);
+            g.setColor(Color.BLACK);
+            g.drawString("Image not found", x + 5, y + 60);
         }
     }
 }
